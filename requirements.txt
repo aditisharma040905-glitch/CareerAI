@@ -1,0 +1,17 @@
+streamlit
+fastapi
+uvicorn
+pandas
+numpy
+scikit-learn
+matplotlib
+plotly
+sqlalchemy
+pymysql
+python-dotenv
+joblib
+spacy
+PyMuPDF
+pdfplumber
+passlib[bcrypt]
+python-multipart
