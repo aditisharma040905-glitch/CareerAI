@@ -1,15 +1,52 @@
-from backend.database.connection import create_connection
+from backend.database.operations import get_students_dataframe
 
-connection = create_connection()
+# Fetch Data
+df = get_students_dataframe()
 
-if connection:
-    print("CareerAI is ready to use!")
+print("\n===== STUDENTS DATAFRAME =====\n")
+print(df)
 
-from backend.database.operations import get_all_students
+print("\n==============================")
+print("Dataset Shape")
+print("==============================")
+print(df.shape)
 
-students = get_all_students()
+print("\n==============================")
+print("Column Names")
+print("==============================")
+print(df.columns)
 
-print("\n===== STUDENTS DATA =====\n")
+print("\n==============================")
+print("Dataset Information")
+print("==============================")
+df.info()
 
-for student in students:
-    print(student)
+print("\n==============================")
+print("Statistical Summary")
+print("==============================")
+print(df.describe())
+
+print("\n==============================")
+print("Average CGPA")
+print("==============================")
+print(df["cgpa"].mean())
+
+print("\n==============================")
+print("Highest CGPA")
+print("==============================")
+print(df["cgpa"].max())
+
+print("\n==============================")
+print("Lowest CGPA")
+print("==============================")
+print(df["cgpa"].min())
+
+print("\n==============================")
+print("Students in Each Branch")
+print("==============================")
+print(df["branch"].value_counts())
+
+print("\n==============================")
+print("Gender Distribution")
+print("==============================")
+print(df["gender"].value_counts())

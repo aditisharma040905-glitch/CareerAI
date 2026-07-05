@@ -2,28 +2,21 @@
 Database Operations
 """
 
+import pandas as pd
 from backend.database.connection import create_connection
 
 
-def get_all_students():
+def get_students_dataframe():
     """
-    Fetch all students from database
+    Fetch all students and return a Pandas DataFrame.
     """
 
     connection = create_connection()
 
-    if connection is None:
-        return []
-
-    cursor = connection.cursor()
-
     query = "SELECT * FROM students"
 
-    cursor.execute(query)
+    df = pd.read_sql(query, connection)
 
-    students = cursor.fetchall()
-
-    cursor.close()
     connection.close()
 
-    return students
+    return df
