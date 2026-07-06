@@ -1,52 +1,26 @@
 from backend.database.operations import get_students_dataframe
+from ml.visualization import (
+    plot_branch_distribution,
+    plot_cgpa_distribution
+)
+from ml.preprocessing import (
+    check_missing_values,
+    check_duplicates,
+    check_data_types
+)
+def main():
+    # Fetch data from MySQL
+    df = get_students_dataframe()
 
-# Fetch Data
-df = get_students_dataframe()
+    print("\n===== STUDENTS DATAFRAME =====\n")
+    print(df)
 
-print("\n===== STUDENTS DATAFRAME =====\n")
-print(df)
+    # Create visualization
+    plot_branch_distribution(df)
+    plot_cgpa_distribution(df)
 
-print("\n==============================")
-print("Dataset Shape")
-print("==============================")
-print(df.shape)
-
-print("\n==============================")
-print("Column Names")
-print("==============================")
-print(df.columns)
-
-print("\n==============================")
-print("Dataset Information")
-print("==============================")
-df.info()
-
-print("\n==============================")
-print("Statistical Summary")
-print("==============================")
-print(df.describe())
-
-print("\n==============================")
-print("Average CGPA")
-print("==============================")
-print(df["cgpa"].mean())
-
-print("\n==============================")
-print("Highest CGPA")
-print("==============================")
-print(df["cgpa"].max())
-
-print("\n==============================")
-print("Lowest CGPA")
-print("==============================")
-print(df["cgpa"].min())
-
-print("\n==============================")
-print("Students in Each Branch")
-print("==============================")
-print(df["branch"].value_counts())
-
-print("\n==============================")
-print("Gender Distribution")
-print("==============================")
-print(df["gender"].value_counts())
+    check_missing_values(df)
+    check_duplicates(df)
+    check_data_types(df)
+if __name__ == "__main__":
+    main()
