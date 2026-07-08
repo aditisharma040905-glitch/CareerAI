@@ -1,26 +1,69 @@
-from backend.database.operations import get_students_dataframe
-from ml.visualization import (
-    plot_branch_distribution,
-    plot_cgpa_distribution
+from ml.dataset_loader import load_dataset
+from ml.dataset_analysis import (
+    dataset_shape,
+    dataset_columns,
+    dataset_info,
+    dataset_statistics,
 )
-from ml.preprocessing import (
+from ml.data_quality import (
     check_missing_values,
-    check_duplicates,
-    check_data_types
+    check_duplicate_rows,
+    check_data_types,
 )
+
+from ml.feature_engineering import split_features_target
+from ml.train_test_splitter import split_dataset
+from ml.model_training import train_logistic_regression
+
+from ml.encoder import encode_labels
+from ml.evaluation import evaluate_model
 def main():
-    # Fetch data from MySQL
-    df = get_students_dataframe()
+    df = load_dataset()
+    df = encode_labels(df)
+    # print("\n========== FIRST FIVE ROWS ==========")
+    # print(df.head())
 
-    print("\n===== STUDENTS DATAFRAME =====\n")
-    print(df)
+    # dataset_shape(df)
+    # dataset_columns(df)
+    # dataset_info(df)
+    # dataset_statistics(df)
 
-    # Create visualization
-    plot_branch_distribution(df)
-    plot_cgpa_distribution(df)
+    # check_missing_values(df)
+    # check_duplicate_rows(df)
+    # check_data_types(df)
+    
+    
+    X, y = split_features_target(df)
 
-    check_missing_values(df)
-    check_duplicates(df)
-    check_data_types(df)
+    
+    X_train, X_test, y_train, y_test = split_dataset(X, y)
+
+    # print("\n===== TRAINING DATA =====")
+    # print(X_train.shape)
+
+    # print("\n===== TESTING DATA =====")
+    # print(X_test.shape)
+
+    # print("\n===== TRAINING LABELS =====")
+    # print(y_train.shape)
+
+    # print("\n===== TESTING LABELS =====")
+    # print(y_test.shape)
+
+    model = train_logistic_regression(X_train ,y_train)
+    
+
+    print("\n✅ Logistic Regression Model Trained Successfully!")
+    evaluate_model(model, X_test, y_test)
+    
+    # print("\n========== FEATURES ==========")
+    # print(X.head())
+
+    # print("\n========== TARGET ==========")
+    # print(y.head())
+    
+    # print("\n===== ENCODED DATA =====")
+    # print(df.head())
+
 if __name__ == "__main__":
     main()
