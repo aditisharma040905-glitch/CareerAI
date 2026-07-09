@@ -13,10 +13,11 @@ from ml.data_quality import (
 
 from ml.feature_engineering import split_features_target
 from ml.train_test_splitter import split_dataset
-from ml.model_training import (train_logistic_regression, train_decision_tree)
+from ml.model_training import (train_logistic_regression, train_decision_tree,train_random_forest)
 
 from ml.encoder import encode_labels
 from ml.evaluation import evaluate_model
+from ml.model_saver import save_model
 def main():
     df = load_dataset()
     df = encode_labels(df)
@@ -51,17 +52,28 @@ def main():
     # print(y_test.shape)
 
     model = train_logistic_regression(X_train ,y_train)
+    save_model(model)
+
+    evaluate_model(model, X_test, y_test)
     
 
-    print("\n✅ Logistic Regression Model Trained Successfully!")
-    evaluate_model(model, X_test, y_test)
-    print("\n" + "="*60)
-    print("DECISION TREE MODEL")
-    print("="*60)
+    # print("\n✅ Logistic Regression Model Trained Successfully!")
+    # evaluate_model(model, X_test, y_test)
+    # print("\n" + "="*60)
+    # print("DECISION TREE MODEL")
+    # print("="*60)
 
-    decision_tree_model = train_decision_tree(X_train, y_train)
+    # decision_tree_model = train_decision_tree(X_train, y_train)
 
-    evaluate_model(decision_tree_model, X_test, y_test)
+    # evaluate_model(decision_tree_model, X_test, y_test)
+
+    # print("\n" + "=" * 60)
+    # print("RANDOM FOREST MODEL")
+    # print("=" * 60)
+
+    # random_forest_model = train_random_forest(X_train, y_train)
+
+    # evaluate_model(random_forest_model, X_test, y_test)
     
     # print("\n========== FEATURES ==========")
     # print(X.head())
