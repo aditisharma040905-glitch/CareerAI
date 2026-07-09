@@ -13,7 +13,7 @@ from ml.data_quality import (
 
 from ml.feature_engineering import split_features_target
 from ml.train_test_splitter import split_dataset
-from ml.model_training import train_logistic_regression
+from ml.model_training import (train_logistic_regression, train_decision_tree)
 
 from ml.encoder import encode_labels
 from ml.evaluation import evaluate_model
@@ -55,6 +55,13 @@ def main():
 
     print("\n✅ Logistic Regression Model Trained Successfully!")
     evaluate_model(model, X_test, y_test)
+    print("\n" + "="*60)
+    print("DECISION TREE MODEL")
+    print("="*60)
+
+    decision_tree_model = train_decision_tree(X_train, y_train)
+
+    evaluate_model(decision_tree_model, X_test, y_test)
     
     # print("\n========== FEATURES ==========")
     # print(X.head())
