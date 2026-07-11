@@ -15,6 +15,10 @@ import sys
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from resume.resume_parser import extract_resume_text
+from resume.skill_extractor import extract_skills
+from resume.recommendations import recommend_skills
+from resume.learning_path import get_learning_path
+from backend.database.operations import save_prediction
 
 # -----------------------------
 # Streamlit Page Configuration
@@ -168,6 +172,32 @@ elif menu == "🎓 Placement Prediction":
 
     st.markdown("---")
 
+
+
+    # ------------------------------------
+    # Student Information
+    # ------------------------------------
+
+    st.subheader("👤 Student Information")
+
+    student_name = st.text_input(
+        "Student Name",
+        placeholder="Enter your full name"
+    )
+
+    job_role = st.selectbox(
+        "Target Job Role",
+        [
+            "Data Scientist",
+            "AI Engineer",
+            "Data Analyst",
+            "Software Developer",
+            "Web Developer"
+        ]
+    )
+
+    st.markdown("---")
+
     # ------------------------------------
     # Student Input Form
     # ------------------------------------
@@ -252,6 +282,9 @@ elif menu == "🎓 Placement Prediction":
     # ------------------------------------
 
     if predict:
+        if student_name.strip() == "":
+            st.warning("⚠ Please enter the student's name.")
+            st.stop()
         extracurricular_value = 1 if extracurricular == "Yes" else 0
         placement_training_value = 1 if placement_training == "Yes" else 0
 
@@ -282,6 +315,23 @@ elif menu == "🎓 Placement Prediction":
         prediction = model.predict(student)
         probability = model.predict_proba(student)
         confidence = probability.max() * 100
+
+        # ------------------------------------
+        # Save Prediction in Database
+        # ------------------------------------
+
+        prediction_result = (
+            "Placed"
+            if prediction[0] == 1
+            else "Not Placed"
+        )
+
+        save_prediction(
+            student_name,
+            job_role,
+            prediction_result,
+            float(confidence)
+        )
 
         st.markdown("---")
         st.subheader("📊 Prediction Result")
@@ -374,38 +424,91 @@ elif menu == "🎓 Placement Prediction":
 
 elif menu == "📄 Resume Analyzer":
     st.title("📄 Resume Analyzer")
+    st.subheader("🎯 Select Your Target Job Role")
 
-    st.info("This module will be implemented in the next phase.")
+    job_role = st.selectbox(
+        "Choose Job Role",
+        [
+            "Data Scientist",
+            "AI Engineer",
+            "Data Analyst",
+            "Software Developer",
+            "Web Developer"
+        ]
+    )
+
+    st.markdown("---")
+
+
 
     uploaded_file = st.file_uploader(
     "Upload Resume (PDF)",
     type=["pdf"]
-)
+    )
 
-if uploaded_file is not None:
+    if uploaded_file is not None:
 
-    st.success("✅ Resume Uploaded Successfully!")
+        st.success("✅ Resume Uploaded Successfully!")
 
-    temp_path = os.path.join("app", uploaded_file.name)
+        temp_path = os.path.join("app", uploaded_file.name)
 
-    with open(temp_path, "wb") as f:
-        f.write(uploaded_file.getbuffer())
+        with open(temp_path, "wb") as f:
+            f.write(uploaded_file.getbuffer())
 
-    resume_text = extract_resume_text(temp_path)
+        resume_text = extract_resume_text(temp_path)
 
-    st.subheader("📄 Extracted Resume Text")
+        st.subheader("📄 Extracted Resume Text")
 
-    if resume_text:
+        if resume_text:
 
-        st.text_area(
-            "Resume Content",
-            resume_text,
-            height=400
-        )
+            st.text_area(
+                "Resume Content",
+                resume_text,
+                height=400
+            )
 
-    else:
+        else:
 
-        st.error("Unable to read the resume.")
+            st.error("Unable to read the resume.")
+
+    # ---------------------------------------
+    # Detect Skills
+    # ---------------------------------------
+
+        skills = extract_skills(resume_text)
+
+        st.subheader("🛠 Detected Skills")
+
+        if len(skills) > 0:
+
+            for skill in skills:
+                st.success(f"✅ {skill}")
+
+        else:
+
+            st.warning("No known skills were detected.")
+
+        # ---------------------------------------
+        # Missing Skills
+        # ---------------------------------------
+
+        missing_skills = recommend_skills(skills, job_role)
+
+        st.subheader(f"📚 Missing Skills for {job_role}")
+
+        if len(missing_skills) > 0:
+
+            for skill in missing_skills:
+
+                st.error(f"❌ {skill}")
+
+                recommendation = get_learning_path(skill)
+
+                st.info(f"📖 Recommendation: {recommendation}")
+
+        else:
+
+            st.success("🎉 Excellent! You already have all the required skills for this role.")
 # -----------------------------------------------------------
 # Prediction History
 # -----------------------------------------------------------
