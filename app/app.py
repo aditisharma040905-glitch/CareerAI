@@ -18,7 +18,7 @@ from resume.resume_parser import extract_resume_text
 from resume.skill_extractor import extract_skills
 from resume.recommendations import recommend_skills
 from resume.learning_path import get_learning_path
-from backend.database.operations import save_prediction
+from backend.database.operations import (save_prediction, get_prediction_history,get_dashboard_stats)
 
 # -----------------------------
 # Streamlit Page Configuration
@@ -112,52 +112,91 @@ if menu == "🏠 Home":
 
     st.markdown("---")
 
+    # -----------------------------------------
+    # Dashboard Statistics
+    # -----------------------------------------
+
+    total_predictions, placed_students, not_placed_students = get_dashboard_stats()
+
+    st.subheader("📊 Dashboard Overview")
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.metric(
+            label="Total Predictions",
+            value=total_predictions
+        )
+
+    with col2:
+        st.metric(
+            label="Placed Students",
+            value=placed_students
+        )
+
+    with col3:
+        st.metric(
+            label="Not Placed",
+            value=not_placed_students
+        )
+
+    st.markdown("---")
+
+    # -----------------------------------------
+    # Project Description
+    # -----------------------------------------
+
     st.markdown(
         """
-### Welcome to CareerAI
+## Welcome to CareerAI
 
-CareerAI is an Artificial Intelligence based Placement Prediction
-System developed for students.
+CareerAI is an **Artificial Intelligence-based Placement Prediction System**
+developed to help students evaluate their placement readiness and identify
+the skills they need to improve.
 
-The application predicts whether a student is likely to be placed
-based on academic performance and skill-related information.
+The system uses a **Machine Learning model** to predict whether a student
+is likely to be placed based on academic performance and skill-related
+information.
 
-### Main Features
+### 🚀 Main Features
 
 - 🎓 Placement Prediction
-
 - 📄 Resume Analyzer
-
 - 📊 Prediction History
-
-- 💡 Career Recommendation
-
+- 💡 Career Recommendations
 - 🤖 Machine Learning Model
-
 - 🗄️ MySQL Database
 
 ---
 
-### Project Workflow
+## 📌 Project Workflow
 
-Student Details
-
-⬇
-
-Machine Learning Model
+👤 Student Information
 
 ⬇
 
-Placement Prediction
+📊 Placement Prediction
 
 ⬇
 
-Career Suggestions
+📄 Resume Analysis
+
+⬇
+
+🛠 Skill Gap Detection
+
+⬇
+
+📚 Learning Recommendations
+
+⬇
+
+🎯 Career Guidance
 
 """
     )
 
-    st.info("Select **Placement Prediction** from the sidebar to start.")
+    st.success("✅ Select **Placement Prediction** from the sidebar to begin.")
 
 # -----------------------------------------------------------
 # Placement Prediction Page
@@ -514,8 +553,23 @@ elif menu == "📄 Resume Analyzer":
 # -----------------------------------------------------------
 
 elif menu == "📊 Prediction History":
+
     st.title("📊 Prediction History")
-    st.info("Prediction history will be connected to the MySQL database.")
+
+    history = get_prediction_history()
+
+    if history.empty:
+
+        st.warning("No prediction history found.")
+
+    else:
+
+        st.success(f"Total Predictions: {len(history)}")
+
+        st.dataframe(
+            history,
+            width="stretch"
+        )
 
 # -----------------------------------------------------------
 # About
